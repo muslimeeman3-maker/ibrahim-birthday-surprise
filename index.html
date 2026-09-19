@@ -26,8 +26,70 @@ These past three months with you have felt like a dream. Conversations with you 
 <section class="page cakepage"><div class="lights"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="balloon b1"></div><div class="balloon b2"></div><div class="balloon b3"></div><div class="balloon b4"></div><div class="cakebox"><div class="gold">One final birthday wish</div><h2>Make a wish, Ibrahim 🎂</h2><p>Ibrahim, blow the candle in 3 seconds.</p><div class="timer" id="timer">3</div><div class="cake"></div><div class="candle" id="candle"><div class="wick"></div><div class="flame"></div></div><button class="btn" id="blow">Blow the Candle</button><div class="wish" id="wish">Happy Birthday Ibrahim! 🎉</div></div></section>
 </main>
 <script>
-const $=id=>document.getElementById(id),opening=$("opening"),main=$("main"),song=$("song");let started=false,ready=false,blown=false;
-$("start").onclick=()=>{if(started)return;started=true;$("start").disabled=true;let n=10;$("introcount").textContent=n;let t=setInterval(()=>{n--;$("introcount").textContent=n;if(n<=0){clearInterval(t);opening.classList.add("hide");main.classList.remove("hidden");song.play().catch(()=>{});setTimeout(()=>{let c=3;$("timer").textContent=c;let x=setInterval(()=>{c--;$("timer").textContent=c>0?c:"Blow!";if(c<=0){clearInterval(x);ready=true}},1000)},700)}},1000)};
-function blow(){if(!ready||blown)return;blown=true;$("candle").classList.add("blown");$("wish").classList.add("show")}$("blow").onclick=blow;$("candle").onclick=blow;
-const observer=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add("show")}),{threshold:.15});document.querySelectorAll(".reveal").forEach(e=>observer.observe(e));
+const $=id=>document.getElementById(id),opening=$("opening"),main=$("main"),song=$("song");
+let started=false,ready=false,blown=false;
+
+const START_TIME = 10;
+const END_TIME = 50;
+
+song.addEventListener("loadedmetadata", () => {
+  song.currentTime = START_TIME;
+});
+
+song.addEventListener("timeupdate", () => {
+  if (song.currentTime >= END_TIME) {
+    song.pause();
+    song.currentTime = START_TIME;
+  }
+});
+
+function playTrimmedSong() {
+  song.currentTime = START_TIME;
+  song.play().catch(() => {
+    console.log("Press the audio player's Play button.");
+  });
+}
+
+$("start").onclick=()=>{
+  if(started)return;
+  started=true;
+  $("start").disabled=true;
+  let n=10;
+  $("introcount").textContent=n;
+  let t=setInterval(()=>{
+    n--;
+    $("introcount").textContent=n;
+    if(n<=0){
+      clearInterval(t);
+      opening.classList.add("hide");
+      main.classList.remove("hidden");
+      playTrimmedSong();
+      setTimeout(()=>{
+        let c=3;
+        $("timer").textContent=c;
+        let x=setInterval(()=>{
+          c--;
+          $("timer").textContent=c>0?c:"Blow!";
+          if(c<=0){
+            clearInterval(x);
+            ready=true;
+          }
+        },1000);
+      },700);
+    }
+  },1000);
+};
+
+function blow(){
+  if(!ready||blown)return;
+  blown=true;
+  $("candle").classList.add("blown");
+  $("wish").classList.add("show");
+}
+
+$("blow").onclick=blow;
+$("candle").onclick=blow;
+
+const observer=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add("show")}),{threshold:.15});
+document.querySelectorAll(".reveal").forEach(e=>observer.observe(e));
 </script></body></html>
